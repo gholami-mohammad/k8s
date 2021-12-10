@@ -126,7 +126,7 @@ After adding manifest files, follow these steps:
     kubectl taint nodes --all node-role.kubernetes.io/master-
     ```
 
-1. Confirm that you now have a node in your cluster with the following command.
+1. Confirm that you have a node in your cluster with the following command.
     ```
     kubectl get nodes -o wide
     ```
@@ -155,6 +155,9 @@ Logout and login again to enable auto completion
 
 ## Create new join token
 ```
+kubeadm token list
+
+# create new token
 kubeadm token create
 
 openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
@@ -162,11 +165,18 @@ openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outfor
 ```
 
 ## Dashboard
-execute these commands as normal user
+To install kubernetes dashboard, execute these commands as normal user
 ```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.3.1/aio/deploy/recommended.yaml
+```
 
-kubectl port-forward --namespace=kubernetes-dashboard kubernetes-dashboard-67484c44f6-92s2s --address=0.0.0.0 8443:8443
+Get pods of kubernetes-dashboard namespace
+```
+kubectl get pods -n kubernetes-dashboard
+```
+Copy the name of kubernetes-dashboard pod and replace in the following command:
+``
+kubectl port-forward --namespace=kubernetes-dashboard POD_NAME_HERE --address=0.0.0.0 8443:8443
 ```
 
 **Find Dashboard port**
@@ -201,10 +211,13 @@ subjects:
 EOF
 
 kubectl apply -f dashboard-adminuser.yaml
+```
 
+Find the generated token using these commands:
+```
 kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}"
 
-OR
+# OR
 
 kubectl describe secrets admin-user -n kubernetes-dashboard # Copy token
 ```
