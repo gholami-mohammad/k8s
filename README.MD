@@ -1,3 +1,9 @@
+***BEFORE START: Make sure that swap is off***
+```
+sudo swapoff -a
+```
+OR edit `/etc/fstab` and comment any swap entries then reboot your server
+
 # containerd as CRI
 Prerequisites
 ```
@@ -73,9 +79,6 @@ net.bridge.bridge-nf-call-iptables = 1
 EOF
 
 sudo sysctl --system
-
-sudo apt update
-sudo apt install -y apt-transport-https ca-certificates curl
 
 sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
 
