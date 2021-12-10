@@ -174,12 +174,14 @@ Get pods of kubernetes-dashboard namespace
 ```
 kubectl get pods -n kubernetes-dashboard
 ```
+
 Copy the name of kubernetes-dashboard pod and replace in the following command:
-``
+```
 kubectl port-forward --namespace=kubernetes-dashboard POD_NAME_HERE --address=0.0.0.0 8443:8443
 ```
 
 **Find Dashboard port**
+
 ```
 kubectl describe --namespace=kubernetes-dashboard services
 ```
