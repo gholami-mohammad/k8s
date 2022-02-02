@@ -4,32 +4,8 @@ sudo swapoff -a
 ```
 OR edit `/etc/fstab` and comment any swap entries then reboot your server
 
-# containerd as CRI
-Prerequisites
+# Docker
 ```
-cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
-overlay
-br_netfilter
-EOF
-
-sudo modprobe overlay
-sudo modprobe br_netfilter
-
-# Setup required sysctl params, these persist across reboots.
-cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
-net.bridge.bridge-nf-call-iptables  = 1
-net.ipv4.ip_forward                 = 1
-net.bridge.bridge-nf-call-ip6tables = 1
-EOF
-
-# Apply sysctl params without reboot
-sudo sysctl --system
-```
-Install containerd:
-```
-sudo apt update
-sudo apt upgrade -y
-
 sudo apt install \
     apt-transport-https \
     ca-certificates \
@@ -45,29 +21,45 @@ echo \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 sudo apt update
-sudo apt install -y containerd.io
+sudo apt install -y docker-ce docker-ce-cli containerd.io
 
-sudo mkdir -p /etc/containerd
-containerd config default | sudo tee /etc/containerd/config.toml
-sudo systemctl restart containerd
-```
+sudo groupadd docker
+sudo usermod -aG docker $USER
 
-## Using the systemd cgroup driver
-```
-sudo vim /etc/containerd/config.toml
-```
-To use the systemd cgroup driver in `/etc/containerd/config.toml` with `runc`, set
-```
-[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-  ...
-  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-    SystemdCgroup = true
-```
-```
-sudo systemctl restart containerd
 ```
 
-# Kubeadm, Kubelete, and Kubectl
+### docker cgroup config
+```
+sudo vim /etc/docker/daemon.json
+```
+Add this config:
+```
+{
+  "exec-opts": ["native.cgroupdriver=systemd"]
+}
+```
+
+```
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+# Kubernetes
+
+```
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+
+sudo sysctl --system
+```
+
+## Kubeadm, Kubelete, and Kubectl
 ```
 cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
 br_netfilter
@@ -91,11 +83,12 @@ sudo apt-mark hold kubelet kubeadm kubectl
 ```
 
 
-Initialize kubeadm
+### Initialize kubeadm
 ```
 sudo kubeadm init -v=6 --pod-network-cidr=192.168.0.0/16 
 
 ```
+
 **As Normal user Or Root choose one method**
 ```
 # as normatl user
