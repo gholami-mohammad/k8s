@@ -85,7 +85,7 @@ sudo apt-mark hold kubelet kubeadm kubectl
 
 ### Initialize kubeadm
 ```
-sudo kubeadm init -v=6 --pod-network-cidr=192.168.0.0/16 
+sudo kubeadm init -v=6 --pod-network-cidr=192.168.0.0/16
 
 ```
 
@@ -104,8 +104,8 @@ export KUBECONFIG=/etc/kubernetes/admin.conf
 
 ## Install  Calico network plugin
 ```
-kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
-kubectl create -f https://docs.projectcalico.org/manifests/custom-resources.yaml
+kubectl create -f https://projectcalico.docs.tigera.io/manifests/tigera-operator.yaml
+kubectl create -f https://projectcalico.docs.tigera.io/manifests/custom-resources.yaml
 ```
 
 After adding manifest files, follow these steps:
@@ -126,7 +126,7 @@ After adding manifest files, follow these steps:
 
 1. Install calicoctl 
     ```
-    curl -o calicoctl -O -L  "https://github.com/projectcalico/calicoctl/releases/download/v3.20.2/calicoctl" 
+    curl -o calicoctl -O -L  "https://github.com/projectcalico/calico/releases/download/v3.22.0/calicoctl-linux-amd64" 
 
     sudo chmod +x calicoctl
 
