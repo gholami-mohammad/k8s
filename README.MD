@@ -217,6 +217,15 @@ kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get
 kubectl describe secrets admin-user -n kubernetes-dashboard # Copy token
 ```
 
+# Install Nginx Ingress
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.1/deploy/static/provider/baremetal/deploy.yaml
+
+POD_NAMESPACE=ingress-nginx
+POD_NAME=$(kubectl get pods -n $POD_NAMESPACE -l app.kubernetes.io/name=ingress-nginx --field-selector=status.phase=Running -o name)
+kubectl exec $POD_NAME -n $POD_NAMESPACE -- /nginx-ingress-controller --version
+```
+
 # Helm
 ```
 curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
